@@ -5,31 +5,31 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/spf13/viper"
 )
 
 type Server struct {
 	redis *redis.Client
 }
 
-func init() {
-	viper.SetDefault("redis.host", "localhost")
-	viper.SetDefault("redis.port", "6773")
-	viper.SetDefault("redis.password", "")
-	viper.SetDefault("redis.db", "0")
+// func init() {
+// 	viper.SetDefault("redis.host", "localhost")
+// 	viper.SetDefault("redis.port", "6773")
+// 	viper.SetDefault("redis.password", "")
+// 	viper.SetDefault("redis.db", "0")
 
-	viper.SetConfigName("config")
-	viper.SetConfigType("toml")
-	viper.AddConfigPath("/app-dev")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %v", err))
-	}
-}
+// 	viper.SetConfigName("config")
+// 	viper.SetConfigType("toml")
+// 	viper.AddConfigPath("/app-dev")
+// 	viper.AddConfigPath(".")
+// 	err := viper.ReadInConfig()
+// 	if err != nil {
+// 		panic(fmt.Errorf("fatal error config file: %v", err))
+// 	}
+// }
 
 func (s *Server) Run() {
 	fmt.Println("Running...")
@@ -53,16 +53,16 @@ func (s *Server) Run() {
 		}
 	})
 
-	serverAdress := fmt.Sprintf(":%s", viper.GetString("server.port"))
+	serverAdress := fmt.Sprintf(":%s", os.Getenv("SERVER_HOST"))
 	log.Fatal(http.ListenAndServe(serverAdress, nil))
 }
 
 func main() {
 
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", viper.GetString("redis.host"), viper.GetString("redis.port")),
-		Password: viper.GetString("redis.password"),
-		DB:       viper.GetInt("redis.db"),
+		Addr:     fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
+		Password: os.Getenv("REDIS_PASS"),
+		DB:       0,
 	})
 	server := Server{redis: redisClient}
 	server.Run()
