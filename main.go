@@ -23,6 +23,7 @@ func init() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
+	viper.AddConfigPath("/app-dev")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
